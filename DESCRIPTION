@@ -1,0 +1,11 @@
+Package: HAPT
+Type: Package
+Title: Online density estimation with Hierarchical Adaptive Polya Trees
+Version: 0.1
+Date: 2016-11-18
+Author: Jonathan Christensen
+Maintainer: Jonathan Christensen <jonathan.christensen@stat.duke.edu>
+Description: This package implements the Hierarchical Adaptive Polya Tree of Christensen and Ma (2017).
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.11)
+LinkingTo: Rcpp
