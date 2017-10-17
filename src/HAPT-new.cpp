@@ -555,7 +555,7 @@ void main_recursion_function(int remaining_levels, // how much deeper are we goi
 
 
 // [[Rcpp::export]]
-Rcpp::List HAPT_new(Rcpp::NumericVector x, Rcpp::IntegerVector groups, 
+Rcpp::List HAPT(Rcpp::NumericVector x, Rcpp::IntegerVector groups, 
                     int maxlevel = 10, int nu_states = 4, int tau_states = 4, 
                     Rcpp::NumericVector nu_lims = Rcpp::NumericVector::create(0.0,4.0), 
                     Rcpp::NumericVector tau_lims = Rcpp::NumericVector::create(0.0,4.0),
