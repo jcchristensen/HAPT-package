@@ -25,11 +25,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
-RcppExport SEXP _HAPT_HAPT_new(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_HAPT_HAPT", (DL_FUNC) &_HAPT_HAPT, 9},
-    {"_HAPT_HAPT_new", (DL_FUNC) &_HAPT_HAPT_new, 9},
     {NULL, NULL, 0}
 };
 

@@ -1,6 +1,6 @@
 Package: HAPT
 Type: Package
-Title: Online density estimation with Hierarchical Adaptive Polya Trees
+Title: Multiple density estimation with Hierarchical Adaptive Polya Trees
 Version: 0.1
 Date: 2016-11-18
 Author: Jonathan Christensen
