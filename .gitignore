@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# Random stuff
+.DS_Store
+.Rhistory
+.RData
