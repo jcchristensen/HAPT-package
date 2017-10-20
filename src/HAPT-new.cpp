@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define THETA_EVAL 11
+#define THETA_EVAL 101
 // THETA_EVAL must be odd.
 #define TAU_EVAL 11
 #define NU_EVAL 11
