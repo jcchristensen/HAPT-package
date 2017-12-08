@@ -122,23 +122,27 @@ void main_recursion_function(int remaining_levels, // how much deeper are we goi
         vector< vector< double > > posterior_transition_probability_R(p->tau_states, vector< double >(p->nu_states, 0));
         double max_child_partial_log_ML_L =  partial_log_ML_L[i][j];
         double max_child_partial_log_ML_R =  partial_log_ML_R[i][j];
-        for(int k = i; k < p->tau_states; k++) {
-          for(int l = j; l < p->nu_states; l++) {
-            if(partial_log_ML_L[k][l] > max_child_partial_log_ML_L)
-              max_child_partial_log_ML_L = partial_log_ML_L[k][l];
-            if(partial_log_ML_R[k][l] > max_child_partial_log_ML_R)
-              max_child_partial_log_ML_R = partial_log_ML_R[k][l];
+        for(int k = 0; k < p->tau_states; k++) {
+          for(int l = 0; l < p->nu_states; l++) {
+            if(p->tau_transition[i][k] > 0 && p->nu_transition[j][l] > 0) {
+              if(partial_log_ML_L[k][l] > max_child_partial_log_ML_L)
+                max_child_partial_log_ML_L = partial_log_ML_L[k][l];
+              if(partial_log_ML_R[k][l] > max_child_partial_log_ML_R)
+                max_child_partial_log_ML_R = partial_log_ML_R[k][l];
+            }
           }
         }
         double children_ML_L = 0;
         double children_ML_R = 0;
         //Rcpp::Rcout << "C_tau = " << i << ", C_nu = " << j << ": ";
-        for(int k = i; k < p->tau_states; k++) {
-          for(int l = j; l < p->nu_states; l++) {
-            posterior_transition_probability_L[k][l] = p->tau_transition[i][k]*p->nu_transition[j][l] * exp(partial_log_ML_L[k][l] - max_child_partial_log_ML_L);
-            posterior_transition_probability_R[k][l] = p->tau_transition[i][k]*p->nu_transition[j][l] * exp(partial_log_ML_R[k][l] - max_child_partial_log_ML_R);
-            children_ML_L += posterior_transition_probability_L[k][l];
-            children_ML_R += posterior_transition_probability_R[k][l];
+        for(int k = 0; k < p->tau_states; k++) {
+          for(int l = 0; l < p->nu_states; l++) {
+            if(p->tau_transition[i][k] > 0 && p->nu_transition[j][l] > 0) {
+              posterior_transition_probability_L[k][l] = p->tau_transition[i][k]*p->nu_transition[j][l] * exp(partial_log_ML_L[k][l] - max_child_partial_log_ML_L);
+              posterior_transition_probability_R[k][l] = p->tau_transition[i][k]*p->nu_transition[j][l] * exp(partial_log_ML_R[k][l] - max_child_partial_log_ML_R);
+              children_ML_L += posterior_transition_probability_L[k][l];
+              children_ML_R += posterior_transition_probability_R[k][l];
+            }
             //Rcpp::Rcout << partial_log_ML_L[k][l] << ", ";
           }
         }
@@ -146,11 +150,12 @@ void main_recursion_function(int remaining_levels, // how much deeper are we goi
         //Rcpp::Rcout << children_ML_L << ", " << children_ML_R << endl;
 
         //Rcpp::Rcout << "Posterior transition: ";
-        for(int k = i; k < p->tau_states; k++) {
-          for(int l = j; l < p->nu_states; l++) {
-            posterior_transition_probability_L[k][l] /= children_ML_L;
-            posterior_transition_probability_R[k][l] /= children_ML_R;
-            
+        for(int k = 0; k < p->tau_states; k++) {
+          for(int l = 0; l < p->nu_states; l++) {
+            if(p->tau_transition[i][k] > 0 && p->nu_transition[j][l] > 0) {
+              posterior_transition_probability_L[k][l] /= children_ML_L;
+              posterior_transition_probability_R[k][l] /= children_ML_R;
+            }
             //Rcpp::Rcout << posterior_transition_probability_L[k][l] << ", ";
           }
         }
@@ -169,25 +174,27 @@ void main_recursion_function(int remaining_levels, // how much deeper are we goi
         vector< double > children_variance_function_term2_R(grid_size, 0);
         for(int k = 0; k < p->tau_states; k++) {
           for(int l = 0; l < p->nu_states; l++) {
-            for(int m = 0; m < grid_size; m++) {
-              children_mean_density_L[m] += posterior_transition_probability_L[k][l] * //
-                mean_density_L[k][l][m];
-              children_mean_density_R[m] += posterior_transition_probability_R[k][l] * //
-                mean_density_R[k][l][m];
-              for(int n = 0; n < p->n_groups; n++) {
-                children_sample_densities_L[n][m] += posterior_transition_probability_L[k][l] * //
-                  sample_densities_L[k][l][n][m];
-                children_sample_densities_R[n][m] += posterior_transition_probability_R[k][l] * //
-                  sample_densities_R[k][l][n][m];
+            if(p->tau_transition[i][k] > 0 && p->nu_transition[j][l] > 0) {
+              for(int m = 0; m < grid_size; m++) {
+                children_mean_density_L[m] += posterior_transition_probability_L[k][l] * //
+                  mean_density_L[k][l][m];
+                children_mean_density_R[m] += posterior_transition_probability_R[k][l] * //
+                  mean_density_R[k][l][m];
+                for(int n = 0; n < p->n_groups; n++) {
+                  children_sample_densities_L[n][m] += posterior_transition_probability_L[k][l] * //
+                    sample_densities_L[k][l][n][m];
+                  children_sample_densities_R[n][m] += posterior_transition_probability_R[k][l] * //
+                    sample_densities_R[k][l][n][m];
+                }
+                children_variance_function_term1_L[m] += posterior_transition_probability_L[k][l] * //
+                  variance_function_term1_L[k][l][m];
+                children_variance_function_term1_R[m] += posterior_transition_probability_R[k][l] * //
+                  variance_function_term1_R[k][l][m];
+                children_variance_function_term2_L[m] += posterior_transition_probability_L[k][l] * //
+                  variance_function_term2_L[k][l][m];
+                children_variance_function_term2_R[m] += posterior_transition_probability_R[k][l] * //
+                  variance_function_term2_R[k][l][m];
               }
-              children_variance_function_term1_L[m] += posterior_transition_probability_L[k][l] * //
-                variance_function_term1_L[k][l][m];
-              children_variance_function_term1_R[m] += posterior_transition_probability_R[k][l] * //
-                variance_function_term1_R[k][l][m];
-              children_variance_function_term2_L[m] += posterior_transition_probability_L[k][l] * //
-                variance_function_term2_L[k][l][m];
-              children_variance_function_term2_R[m] += posterior_transition_probability_R[k][l] * //
-                variance_function_term2_R[k][l][m];
             }
           }
         }
@@ -557,9 +564,10 @@ void main_recursion_function(int remaining_levels, // how much deeper are we goi
 // [[Rcpp::export]]
 Rcpp::List HAPT(Rcpp::NumericVector x, Rcpp::IntegerVector groups, 
                     int maxlevel = 10, int nu_states = 4, int tau_states = 4, 
-                    Rcpp::NumericVector nu_lims = Rcpp::NumericVector::create(0.0,4.0), 
-                    Rcpp::NumericVector tau_lims = Rcpp::NumericVector::create(0.0,4.0),
-                    double beta_nu = 1, double beta_tau = 1 ) {
+                    Rcpp::NumericVector nu_lims = Rcpp::NumericVector::create(-1.0,4.0), 
+                    Rcpp::NumericVector tau_lims = Rcpp::NumericVector::create(1.0,4.0),
+                    double beta_nu = 1, double beta_tau = 1, 
+                    double nu_stop_p = 1e-7, double tau_stop_p = 1e-7) {
   
   vector< double > C_x;
   vector< int > C_groups;
@@ -587,11 +595,15 @@ Rcpp::List HAPT(Rcpp::NumericVector x, Rcpp::IntegerVector groups,
     vector<double> nu_transition_row(p.nu_states, 0);
     double row_sum = 0;
     for(int j = i; j < p.nu_states; j++) {
-      nu_transition_row[j] = exp(beta_nu * (i - j));
-      row_sum += nu_transition_row[j];
+      if(i < p.nu_states-1 && j == p.nu_states-1) {
+        nu_transition_row[j] = nu_stop_p; // special stopping probability
+      } else {
+        nu_transition_row[j] = exp(beta_nu * (i - j));
+        row_sum += nu_transition_row[j];
+      }
     }
-    for(int j = i; j < p.nu_states; j++) {
-      nu_transition_row[j] /= row_sum;
+    for(int j = i; j < p.nu_states-1; j++) {
+      nu_transition_row[j] *= (1-nu_stop_p)/row_sum;
     }
     p.nu_transition.push_back(nu_transition_row);
   }
@@ -599,14 +611,19 @@ Rcpp::List HAPT(Rcpp::NumericVector x, Rcpp::IntegerVector groups,
     vector<double> tau_transition_row(p.tau_states, 0);
     double row_sum = 0;
     for(int j = i; j < p.tau_states; j++) {
-      tau_transition_row[j] = exp(beta_tau * (i - j));
-      row_sum += tau_transition_row[j];
+      if(i < p.tau_states-1 && j == p.tau_states-1) {
+        tau_transition_row[j] = tau_stop_p; // special stopping probability
+      } else {
+        tau_transition_row[j] = exp(beta_tau * (i - j));
+        row_sum += tau_transition_row[j];
+      }
     }
-    for(int j = i; j < p.tau_states; j++) {
-      tau_transition_row[j] /= row_sum;
+    for(int j = i; j < p.tau_states-1; j++) {
+      tau_transition_row[j] *= (1-tau_stop_p)/row_sum;
     }
     p.tau_transition.push_back(tau_transition_row);
   }
+
 
   
   vector<bool> included(x.size(), true);

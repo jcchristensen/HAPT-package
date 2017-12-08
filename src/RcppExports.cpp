@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // HAPT
-Rcpp::List HAPT(Rcpp::NumericVector x, Rcpp::IntegerVector groups, int maxlevel, int nu_states, int tau_states, Rcpp::NumericVector nu_lims, Rcpp::NumericVector tau_lims, double beta_nu, double beta_tau);
-RcppExport SEXP _HAPT_HAPT(SEXP xSEXP, SEXP groupsSEXP, SEXP maxlevelSEXP, SEXP nu_statesSEXP, SEXP tau_statesSEXP, SEXP nu_limsSEXP, SEXP tau_limsSEXP, SEXP beta_nuSEXP, SEXP beta_tauSEXP) {
+Rcpp::List HAPT(Rcpp::NumericVector x, Rcpp::IntegerVector groups, int maxlevel, int nu_states, int tau_states, Rcpp::NumericVector nu_lims, Rcpp::NumericVector tau_lims, double beta_nu, double beta_tau, double nu_stop_p, double tau_stop_p);
+RcppExport SEXP _HAPT_HAPT(SEXP xSEXP, SEXP groupsSEXP, SEXP maxlevelSEXP, SEXP nu_statesSEXP, SEXP tau_statesSEXP, SEXP nu_limsSEXP, SEXP tau_limsSEXP, SEXP beta_nuSEXP, SEXP beta_tauSEXP, SEXP nu_stop_pSEXP, SEXP tau_stop_pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,13 +20,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type tau_lims(tau_limsSEXP);
     Rcpp::traits::input_parameter< double >::type beta_nu(beta_nuSEXP);
     Rcpp::traits::input_parameter< double >::type beta_tau(beta_tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(HAPT(x, groups, maxlevel, nu_states, tau_states, nu_lims, tau_lims, beta_nu, beta_tau));
+    Rcpp::traits::input_parameter< double >::type nu_stop_p(nu_stop_pSEXP);
+    Rcpp::traits::input_parameter< double >::type tau_stop_p(tau_stop_pSEXP);
+    rcpp_result_gen = Rcpp::wrap(HAPT(x, groups, maxlevel, nu_states, tau_states, nu_lims, tau_lims, beta_nu, beta_tau, nu_stop_p, tau_stop_p));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_HAPT_HAPT", (DL_FUNC) &_HAPT_HAPT, 9},
+    {"_HAPT_HAPT", (DL_FUNC) &_HAPT_HAPT, 11},
     {NULL, NULL, 0}
 };
 
